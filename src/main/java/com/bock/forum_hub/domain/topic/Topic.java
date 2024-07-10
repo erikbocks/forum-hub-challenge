@@ -1,5 +1,6 @@
 package com.bock.forum_hub.domain.topic;
 
+import com.bock.forum_hub.domain.answer.Answer;
 import com.bock.forum_hub.domain.course.Course;
 import com.bock.forum_hub.domain.topic.dtos.TopicRegisterData;
 import com.bock.forum_hub.domain.user.User;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "topics")
 @Entity(name = "Topic")
@@ -36,6 +38,9 @@ public class Topic {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author")
     private User author;
+
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Answer> answers;
 
     public Topic(TopicRegisterData data, Course course, User user) {
         this.title = data.title();

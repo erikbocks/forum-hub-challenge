@@ -53,4 +53,14 @@ public class RestResponse {
 
         return ResponseEntity.status(status).body(response);
     }
+
+    public ResponseEntity<RestResponse> ok(String message) {
+        RestResponse response = new RestResponse();
+        HttpStatus status = HttpStatus.OK;
+
+        response.setStatus(status.value());
+        response.setMessage(message);
+
+        return ResponseEntity.status(status).body(response);
+    }
 }
