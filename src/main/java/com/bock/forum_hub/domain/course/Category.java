@@ -1,4 +1,4 @@
-package com.bock.forum_hub.domain;
+package com.bock.forum_hub.domain.course;
 
 public enum Category {
     BACKEND("backend"),
@@ -11,12 +11,13 @@ public enum Category {
         this.category = category;
     }
 
-    Category fromString(String desiredCategory) {
+    public static Category fromString(String desiredCategory) {
         for (Category category : Category.values()) {
             if (category.category.equalsIgnoreCase(desiredCategory)) {
                 return category;
             }
         }
+
         throw new IllegalArgumentException("Nenhuma categoria encontrada para a categoria: " + desiredCategory);
     }
 }

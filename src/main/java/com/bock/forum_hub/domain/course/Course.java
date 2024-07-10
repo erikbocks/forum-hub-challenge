@@ -1,6 +1,6 @@
 package com.bock.forum_hub.domain.course;
 
-import com.bock.forum_hub.domain.Category;
+import com.bock.forum_hub.domain.course.dtos.CourseRegisterDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -21,4 +21,9 @@ public class Course {
     private String name;
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    public Course(CourseRegisterDTO course) {
+        this.name = course.name();
+        this.category = Category.fromString(course.category());
+    }
 }

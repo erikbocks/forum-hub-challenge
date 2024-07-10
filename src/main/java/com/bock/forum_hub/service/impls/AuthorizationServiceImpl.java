@@ -23,20 +23,20 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public User registerUser(UserRegisterDTO data) {
-        Optional<User> dbEmailUser = userRepository.findUserByEmail(data.email());
+        Boolean dbEmailUser = userRepository.existsUserByEmail(data.email().trim());
 
-        if (dbEmailUser.isPresent()) {
+        if (dbEmailUser) {
             throw new ValidationException("Email já cadastrado no banco de dados.");
         }
 
-        Optional<User> dbNameUser = userRepository.findUserByName(data.name().trim());
+        Boolean dbNameUser = userRepository.existsUserByName(data.name().trim());
 
-        if (dbNameUser.isPresent()) {
+        if (dbNameUser) {
             throw new ValidationException("Nome já cadastrado no banco de dados.");
         }
 
         PasswordEncoder passwordEncoder = getPasswordEnconder();
-        User newUser = new User(data, passwordEncoder.encode(data.password()));
+        User newUser = new User(data, passwordEncoder.encode(data.password().trim()));
         userRepository.saveAndFlush(newUser);
 
         return newUser;

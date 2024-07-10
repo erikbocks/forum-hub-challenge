@@ -1,0 +1,1 @@
+alter table topics CHANGE COLUMN creationDate creation_date timestamp;

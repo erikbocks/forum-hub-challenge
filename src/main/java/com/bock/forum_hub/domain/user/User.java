@@ -29,13 +29,13 @@ public class User implements UserDetails {
     private UserRole role;
 
     public User(UserRegisterDTO data, String encodedPassword) {
-        this.name = data.name();
-        this.email = data.email();
+        this.name = data.name().trim();
+        this.email = data.email().trim();
         this.password = encodedPassword;
     }
 
     @PrePersist
-    void updateRole() {
+    void automaticRole() {
         if (this.role == null) {
             this.role = UserRole.COMMON;
         }

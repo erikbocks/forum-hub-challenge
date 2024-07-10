@@ -40,4 +40,25 @@ public class RestErrorResponse {
 
         return ResponseEntity.status(status.value()).body(response);
     }
+
+    public ResponseEntity<RestErrorResponse> badRequest(String message, List<ErrorResponseDTO> errors) {
+        RestErrorResponse response = new RestErrorResponse();
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        response.setMessage(message);
+        response.setStatus(status.value());
+        response.setErrors(errors);
+
+        return ResponseEntity.status(status.value()).body(response);
+    }
+
+    public ResponseEntity<RestErrorResponse> internalServerError(String message) {
+        RestErrorResponse response = new RestErrorResponse();
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        response.setMessage(message);
+        response.setStatus(status.value());
+
+        return ResponseEntity.status(status).body(response);
+    }
 }

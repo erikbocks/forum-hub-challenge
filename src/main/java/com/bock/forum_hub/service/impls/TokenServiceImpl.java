@@ -24,7 +24,7 @@ public class TokenServiceImpl implements TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(apiSecret);
             return JWT.create()
-                    .withSubject(user.getName())
+                    .withSubject(user.getEmail())
                     .withIssuer("Forum-Hub-Api")
                     .withClaim("user-id", user.getId())
                     .withExpiresAt(generateExpirationDate())
@@ -44,7 +44,7 @@ public class TokenServiceImpl implements TokenService {
                     .verify(token)
                     .getClaim("user-id").asLong();
         } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Erro ao validar o token JWT", exception);
+            throw new JWTVerificationException("Esse token é invalido ou está expirado.", exception);
         }
 
     }
