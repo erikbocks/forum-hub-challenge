@@ -3,6 +3,7 @@ package com.bock.forum_hub.domain.topic;
 import com.bock.forum_hub.domain.answer.Answer;
 import com.bock.forum_hub.domain.course.Course;
 import com.bock.forum_hub.domain.topic.dtos.TopicRegisterData;
+import com.bock.forum_hub.domain.topic.dtos.TopicUpdateDTO;
 import com.bock.forum_hub.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,5 +54,14 @@ public class Topic {
     @PrePersist
     public void automaticDate() {
         this.creationDate = LocalDateTime.now();
+    }
+
+    public void update(TopicUpdateDTO data) {
+        if (!data.message().equals(this.message)) {
+            this.message = data.message();
+        }
+        if (!data.title().equals(this.title)) {
+            this.title = data.title();
+        }
     }
 }

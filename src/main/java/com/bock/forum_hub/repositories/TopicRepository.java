@@ -33,4 +33,6 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     Page<Topic> findAllByAuthorId(Pageable pageable, Long owner);
 
     Optional<Topic> findByIdAndAuthorId(Long topicId, Long owner);
+
+    Boolean existsByIdAndAuthorId(Long topicId, Long owner);
 }

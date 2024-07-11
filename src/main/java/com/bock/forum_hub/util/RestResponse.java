@@ -63,4 +63,13 @@ public class RestResponse {
 
         return ResponseEntity.status(status).body(response);
     }
+
+    public ResponseEntity<RestResponse> noContent() {
+        RestResponse response = new RestResponse();
+        HttpStatus status = HttpStatus.NO_CONTENT;
+
+        response.setStatus(status.value());
+
+        return ResponseEntity.status(status).body(response);
+    }
 }

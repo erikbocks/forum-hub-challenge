@@ -4,6 +4,7 @@ import com.bock.forum_hub.domain.course.Course;
 import com.bock.forum_hub.domain.topic.Topic;
 import com.bock.forum_hub.domain.topic.dtos.TopicDetailDTO;
 import com.bock.forum_hub.domain.topic.dtos.TopicRegisterData;
+import com.bock.forum_hub.domain.topic.dtos.TopicUpdateDTO;
 import com.bock.forum_hub.domain.user.User;
 import com.bock.forum_hub.infra.exceptions.customs.ValidationException;
 import com.bock.forum_hub.repositories.CourseRepository;
@@ -27,7 +28,6 @@ public class TopicServiceImpl implements TopicService {
     private UserRepository userRepository;
     @Autowired
     private CourseRepository courseRepository;
-
 
     @Override
     public List<TopicDetailDTO> findAll(Pageable pageable, String username, String course, Integer year) {
@@ -63,22 +63,11 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Topic saveTopic(TopicRegisterData data, String name) {
-        Optional<User> dbUser = userRepository.findUserByName(name);
+    public Topic saveTopic(TopicRegisterData data, String username) {
+        User user = recoverUser(username);
 
-        User user = dbUser.orElseThrow(() -> new RuntimeException("Nenhum usuario encontrado no token."));
-
-        Boolean uniqueTitle = topicRepository.existsByTitleEqualsIgnoreCase(data.title().trim());
-
-        if (uniqueTitle) {
-            throw new ValidationException("Titulo já cadastrado no banco de dados.");
-        }
-
-        Boolean uniqueMessage = topicRepository.existsByMessageEqualsIgnoreCase(data.message().trim());
-
-        if (uniqueMessage) {
-            throw new ValidationException("Mensagem já cadastrado no banco de dados.");
-        }
+        validateUniqueMessage(data.message());
+        validateUniqueTitle(data.title());
 
         Course course;
 
@@ -101,12 +90,70 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public Topic detailTopic(Long topicId, String username) {
-        Optional<User> dbUser = userRepository.findUserByName(username);
-
-        User user = dbUser.orElseThrow(() -> new IllegalArgumentException("Nenhum usuario encontrado no token."));
+        User user = recoverUser(username);
 
         Optional<Topic> dbTopic = topicRepository.findByIdAndAuthorId(topicId, user.getId());
 
         return dbTopic.orElseThrow(() -> new IllegalArgumentException("Nenhum tópico encontrado com esse id."));
+    }
+
+    @Override
+    public Topic updateTopic(Long topicId, TopicUpdateDTO data, String username) {
+        User user = recoverUser(username);
+
+        Optional<Topic> dbTopic = topicRepository.findByIdAndAuthorId(topicId, user.getId());
+
+        if (dbTopic.isEmpty()) {
+            throw new IllegalArgumentException("Nenhum tópico encontrado para esse id.");
+        }
+
+        Topic topic = dbTopic.get();
+
+        if (!topic.getTitle().equals(data.title())) {
+            validateUniqueTitle(data.title());
+        }
+
+        if (!topic.getMessage().equals(data.message())) {
+            validateUniqueMessage(data.message());
+        }
+
+        topic.update(data);
+
+        return topicRepository.saveAndFlush(topic);
+    }
+
+    @Override
+    public void deleteTopic(Long id, String username) {
+        User user = recoverUser(username);
+
+        Boolean dbTopic = topicRepository.existsByIdAndAuthorId(id, user.getId());
+
+        if (!dbTopic) {
+            throw new IllegalArgumentException("Nenhum tópico encontrado com esse id.");
+        }
+
+        topicRepository.deleteById(id);
+    }
+
+    private void validateUniqueMessage(String message) {
+        Boolean notUniqueMessage = topicRepository.existsByMessageEqualsIgnoreCase(message.trim());
+
+        if (notUniqueMessage) {
+            throw new ValidationException("Mensagem já cadastrado no banco de dados.");
+        }
+    }
+
+    private void validateUniqueTitle(String title) {
+        Boolean titleNotUnique = topicRepository.existsByTitleEqualsIgnoreCase(title.trim());
+
+        if (titleNotUnique) {
+            throw new ValidationException("Titulo já cadastrado no banco de dados.");
+        }
+    }
+
+    private User recoverUser(String username) {
+        Optional<User> dbUser = userRepository.findUserByName(username);
+
+        return dbUser.orElseThrow(() -> new IllegalArgumentException("Nenhum usuário encontrado no token."));
     }
 }

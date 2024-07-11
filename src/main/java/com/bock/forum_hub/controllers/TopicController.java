@@ -4,6 +4,7 @@ import com.bock.forum_hub.domain.topic.Topic;
 import com.bock.forum_hub.domain.topic.dtos.TopicDetailDTO;
 import com.bock.forum_hub.domain.topic.dtos.TopicFullDetailDTO;
 import com.bock.forum_hub.domain.topic.dtos.TopicRegisterData;
+import com.bock.forum_hub.domain.topic.dtos.TopicUpdateDTO;
 import com.bock.forum_hub.service.TopicService;
 import com.bock.forum_hub.util.RestResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +60,23 @@ public class TopicController {
         URI uri = builder.path("/topicos/{id}").buildAndExpand(newTopic.getId()).toUri();
 
         return response.created(uri, "Tópico criado com sucesso", new TopicDetailDTO(newTopic));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<RestResponse> editTopic(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid TopicUpdateDTO data, HttpServletRequest request) {
+        String user = request.getUserPrincipal().getName();
+
+        Topic updatedTopic = topicService.updateTopic(id, data, user);
+
+        return response.ok("Topico atualizado com sucesso.", new TopicFullDetailDTO(updatedTopic));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<RestResponse> deleteTopic(@PathVariable @NotNull @Positive Long id, HttpServletRequest request) {
+        String user = request.getUserPrincipal().getName();
+
+        topicService.deleteTopic(id, user);
+
+        return response.noContent();
     }
 }
