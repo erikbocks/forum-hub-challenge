@@ -40,7 +40,7 @@ public class TopicController {
 
         List<TopicDetailDTO> topics = topicService.findAll(pageable, user, course, year);
 
-        return response.ok("teste", topics);
+        return response.ok("Tópicos recuperados com sucesso.", topics);
     }
 
     @GetMapping("/{id}")

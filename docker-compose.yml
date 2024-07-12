@@ -11,7 +11,31 @@ services:
       - MYSQL_ROOT_PASSWORD=docker
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - forum-hub-network
+
+  forum-hub-app:
+    image: forum-hub-app
+    container_name: application
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - database
+    env_file:
+      - environment.env
+    networks:
+      - forum-hub-network
+    stdin_open: true
+    tty: true
 
 volumes:
   mysql_data:
     driver: local
+
+networks:
+  forum-hub-network:
+    name: forum-hub-network
+    driver: bridge
